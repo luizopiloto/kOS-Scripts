@@ -1,16 +1,11 @@
 //(XF-31b Canary) Plane Module
-//This file is distributed under the terms of the MIT license, (c) Luiz o Piloto
+//This file is distributed under the terms of the MIT license, (c)Luiz o Piloto
 
 @lazyglobal off.
 
 //Globals
 global cfgname is "conf.json".
-global conf is lexicon().
-conf:add("kp", -0.37).
-conf:add("ki", -0.61).
-conf:add("kd", -0.16).
-conf:add("prp", 0).
-conf:add("rpm", 420).
+global conf is lexicon("kp", -0.37, "ki", -0.61, "kd", -0.16, "prp", 0, "rpm", 420).
 
 //Get RPM
 function prop_rpm
@@ -77,9 +72,7 @@ function main
     local ls is 0.
     local lst is 0.
     local lstt is 0.
-    local send is lexicon().
-    send:add("proplvl", 0).
-    send:add("thrt", 0).
+    local send is lexicon("proplvl", 0, "thrt", 0).
     
     //AutoProp PID controller
     local maxrpm is conf["rpm"].
@@ -101,15 +94,17 @@ function main
     on ag3 {clearscreen. set tune to ag3. printhelp(ag3). return true.}
     wait 0.
     
+    when not ship:messages:empty then
+    {
+        set recv to ship:messages:pop().
+        set prpm to prop_rpm(recv:content).
+        return true.
+    }
+    wait 0.
+    
     until done
     {
         if (plock:length > 0) {writecfg(propPID:kp, propPID:ki, propPID:kd, plvl, maxrpm). return 0.}
-        if not ship:messages:empty
-        {
-            set recv to ship:messages:peek.
-            set prpm to prop_rpm(recv:content).
-            ship:messages:clear().
-        }
         if autoprp
         {
             set lst to plvl.

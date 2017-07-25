@@ -27,27 +27,21 @@ function main
     on ag1 {set done to true. return true.}
     wait 0.
     
+    when not ship:messages:empty then
+    {
+        set recv to ship:messages:pop().
+        set proplvl to round(recv:content["proplvl"]).
+        set thrt to recv:content["thrt"].
+        for prp in prop {prp:getmodule("modulecontrolsurface"):setfield("authority limiter", proplvl).}
+        if (thrt > 0) {set ship:control:neutralize to false. set ship:control:roll to thrt.}
+        else {set ship:control:neutralize to true. set ship:control:roll to 0.}
+        return true.
+    }
+    wait 0.
+    
     until done
     {
         if (plock:length > 0) {return 0.}
-        if not ship:messages:empty
-        {
-            set recv to ship:messages:peek.
-            set proplvl to round(recv:content["proplvl"]).
-            set thrt to recv:content["thrt"].
-            for prp in prop {prp:getmodule("modulecontrolsurface"):setfield("authority limiter", proplvl).}
-            if (thrt > 0)
-            {
-                set ship:control:neutralize to false.
-                set ship:control:roll to thrt.
-            }
-            else
-            {
-               set ship:control:neutralize to true.
-               set ship:control:roll to 0.
-            }
-            ship:messages:clear().
-        }
         print ("AVMAG:" + send):padright(40) at(0, 1).
         print ("THRT: " + thrt):padright(40) at(0, 2).
         print ("PROP: " + round(prop[0]:getmodule("modulecontrolsurface"):getfield("authority limiter"))):padright(40) at(0, 3).
