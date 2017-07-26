@@ -3,9 +3,6 @@
 
 @lazyglobal off.
 
-//Globals
-global rotorlst is lexicon().
-
 //Revolutions per Minute
 function getrpm
 {
