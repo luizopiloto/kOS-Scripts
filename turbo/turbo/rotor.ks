@@ -1,4 +1,4 @@
-//KrakenTech Turbo Rotor/bladeseller Lib
+//KrakenTech Turbo Rotor/blades Lib
 //This file is distributed under the terms of the MIT license, (c) Luiz o Piloto
 
 @lazyglobal off.
