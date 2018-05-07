@@ -1,4 +1,4 @@
-//KrakenTech Turbo Rotor/blades Lib
+//KrakenTech Turbo Controller - Rotor module
 //This file is distributed under the terms of the MIT license, (c) Luiz o Piloto
 
 @lazyglobal off.
@@ -12,15 +12,29 @@ function loadcfg
     else {return false.}
 }
 
-//Get rotor angle
-function rotorang
+//Get relative angle
+function relangle
 {
-    parameter vess. //Main vessel.
-    local x is vdot(vess:facing:forevector, ship:facing:upvector).
-    local y is vdot(-vess:facing:starvector, ship:facing:upvector).
+    parameter refp. //reference part/vessel.
+    parameter refv. //reference vector.
+    local x is vdot(refp:facing:forevector, refv).
+    local y is vdot(-refp:facing:starvector, refv).
     local res is arctan2(y, x).
     if res < 0 {return 360 + res.}
     else {return res.}
+}
+
+//Get Cyclic
+function cyclic
+{
+	parameter maxpitch.
+	parameter inpt.
+	parameter bld.
+    set bld to mod(bld, 360).
+    if bld < 0 {set bld to 360 + bld.}
+    local rel is abs(inpt - bld).
+    if rel > 180 {set rel to abs(rel - 360).}
+	return maxpitch - ((rel / 90) * maxpitch).
 }
 
 //Entry Point
@@ -33,26 +47,24 @@ function main
     if not (conf:typename = "Lexicon") {return -1.}
     set ship:name to conf["shipname"].
     local remote is vessel(conf["remote"]).
+    local recv is 0.
+    local coll is 0.
+    local rinput is v(0, 0, 0).
+    local offset is -25.
+    local cycl is 20.
+    local cyc1 is 0.
+    local cyc2 is 0.
+    local cyc3 is 0.
+    local cyc4 is 0.
     local lock plock  to ship:partstagged("plock").
     local lock blade1 to ship:partstagged("rblade1").
     local lock blade2 to ship:partstagged("rblade2").
     local lock blade3 to ship:partstagged("rblade3").
     local lock blade4 to ship:partstagged("rblade4").
     local lock claws  to ship:partstagged("rclaw").
-    local recv is 0.
-    local coll is 0.
-    local rpitch is 0.
-    local rroll is 0.
-    local cycl is 12.
-    local cyc1 is 0.
-    local cyc2 is 0.
-    local cyc3 is 0.
-    local cyc4 is 0.
-    local qd1 is 0.
-    local qd2 is 0.
-    local qd3 is 0.
-    local qd4 is 0.
-    local lock rang to rotorang(remote).
+    local lock mpitch to cycl * rinput:mag.
+    local lock rang to relangle(remote:partstagged("refpoint")[0], ship:facing:upvector).
+    local lock ivec to relangle(remote:partstagged("refpoint")[0], rinput).
     local lock send to ship:angularvel:mag.
     
     local rlock is false.
@@ -82,12 +94,7 @@ function main
     {
         set recv to ship:messages:pop().
         set coll to recv:content["coll"].
-        set rpitch to (cycl * recv:content["pitch"]).
-        set rroll to (cycl * recv:content["roll"]).
-        set qd1 to coll - rpitch - rroll.
-        set qd2 to coll + rpitch - rroll.
-        set qd3 to coll + rpitch + rroll.
-        set qd4 to coll - rpitch + rroll.
+        set rinput to recv:content["input"].
         if (ship:messages:empty) and (not remote:isdead) {remote:connection:sendmessage(send).}
         return true.
     }
@@ -96,34 +103,10 @@ function main
     until done
     {
         if (plock:length > 1) {return 0.}
-        if (rang >= 350) or (rang < 80)
-        {
-            set cyc1 to qd1.
-            set cyc2 to qd2.
-            set cyc3 to qd3.
-            set cyc4 to qd4.
-        }
-        else if (rang >= 80) and (rang < 170)
-        {
-            set cyc1 to qd2.
-            set cyc2 to qd3.
-            set cyc3 to qd4.
-            set cyc4 to qd1.
-        }
-        else if (rang >= 170) and (rang < 260)
-        {
-            set cyc1 to qd3.
-            set cyc2 to qd4.
-            set cyc3 to qd1.
-            set cyc4 to qd2.
-        }
-        else
-        {
-            set cyc1 to qd4.
-            set cyc2 to qd1.
-            set cyc3 to qd2.
-            set cyc4 to qd3.
-        }
+        set cyc1 to cyclic(mpitch, ivec, rang + offset) + coll.
+        set cyc2 to cyclic(mpitch, ivec, rang + 90  + offset) + coll.
+        set cyc3 to cyclic(mpitch, ivec, rang + 180 + offset) + coll.
+        set cyc4 to cyclic(mpitch, ivec, rang + 270 + offset) + coll.
         blade1[0]:getmodule("modulecontrolsurface"):setfield("authority limiter", cyc1).
         blade1[1]:getmodule("modulecontrolsurface"):setfield("authority limiter", cyc1).
         blade2[0]:getmodule("modulecontrolsurface"):setfield("authority limiter", cyc2).
@@ -132,7 +115,7 @@ function main
         blade3[1]:getmodule("modulecontrolsurface"):setfield("authority limiter", cyc3).
         blade4[0]:getmodule("modulecontrolsurface"):setfield("authority limiter", cyc4).
         blade4[1]:getmodule("modulecontrolsurface"):setfield("authority limiter", cyc4).
-        if(ship:angularvel:mag < 5) {set rlock to true.}
+        if(ship:angularvel:mag < 3) {set rlock to true.}
         else {set rlock to false.}
         wait 0.
     }
@@ -140,7 +123,7 @@ function main
 }
 
 //Run
-print ("running...").
+print ("Running...").
 local result is main().
 clearscreen.
 if (result = 0) reboot.

@@ -1,5 +1,5 @@
-//(Krakentech Turbo Helicopter Software) Bootloader
-//This file is distributed under the terms of the MIT license, (c)Luiz o Piloto
+//KrakenTech Turbo Controller - Bootloader
+//This file is distributed under the terms of the MIT license, (c) Luiz o Piloto
 
 @lazyglobal off.
 

@@ -1,5 +1,5 @@
-//(Krakentech Helicopter Software) Main craft module
-//This file is distributed under the terms of the MIT license, (c)Luiz o Piloto
+//KrakenTech Turbo Controller - Main craft module
+//This file is distributed under the terms of the MIT license, (c) Luiz o Piloto
 
 @lazyglobal off.
 
@@ -36,10 +36,11 @@ function main
     set ship:name to conf["shipname"].
     local remote is vessel(conf["remote"]).
     local lock plock to ship:partstagged("plock").
+    local lock ivec to (-ship:partstagged("refpoint")[0]:facing:forevector * ship:control:pilotpitch) + (ship:partstagged("refpoint")[0]:facing:starvector * ship:control:pilotroll).
     local rrpm is 0.
-    local coll to 0.
+    local coll is 0.
     local recv is 0.
-    local send is lexicon("coll", 0, "pitch", 0, "roll", 0).
+    local send is lexicon("coll", 0, "input", v(0, 0, 0)).
 
     when not ship:messages:empty then
     {
@@ -53,14 +54,14 @@ function main
     {
         if (plock:length > 1) {return 0.}
         set send["coll"]  to coll.
-        set send["pitch"] to ship:control:pilotpitch.
-        set send["roll"]  to ship:control:pilotroll.
+        if ivec:mag > 1 {set send["input"] to ivec:normalized.}
+        else {set send["input"] to ivec.}
         if not remote:isdead {remote:connection:sendmessage(send).}
 
         //Collective Input
         if (ship:control:pilottop > 0)
         {
-            if (coll > 24) {set coll to 25.}
+            if (coll > 29) {set coll to 30.}
             else {set coll to coll + 1.}
         } 
         else if (ship:control:pilottop < 0)

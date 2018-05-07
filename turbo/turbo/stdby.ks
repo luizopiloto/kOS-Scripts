@@ -1,5 +1,5 @@
-//(Krakentech Turbo Helicopter Software) StandBy module
-//This file is distributed under the terms of the MIT license, (c)Luiz o Piloto
+//KrakenTech Turbo Controller - StandBy module
+//This file is distributed under the terms of the MIT license, (c) Luiz o Piloto
 
 @lazyglobal off.
 
