@@ -27,14 +27,14 @@ function relangle
 //Get Cyclic
 function cyclic
 {
-	parameter maxpitch.
-	parameter inpt.
-	parameter bld.
+    parameter maxpitch.
+    parameter inpt.
+    parameter bld.
     set bld to mod(bld, 360).
     if bld < 0 {set bld to 360 + bld.}
     local rel is abs(inpt - bld).
     if rel > 180 {set rel to abs(rel - 360).}
-	return maxpitch - ((rel / 90) * maxpitch).
+    return maxpitch - ((rel / 90) * maxpitch).
 }
 
 //Entry Point
