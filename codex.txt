@@ -1,3 +1,4 @@
+-----------------------------------------------------------
 Neutral
 Strong against	- None
 Weak against	- Sorcery, Ghost, Holy and Poison
@@ -33,3 +34,4 @@ Weak against	- Earth and Poison
 Sorcery  
 Strong against	- Neutral, Earth, Wind and Poison
 Weak against	- Water and Ghost 
+-----------------------------------------------------------
