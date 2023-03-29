@@ -1,0 +1,35 @@
+Neutral
+Strong against	- None
+Weak against	- Sorcery, Ghost, Holy and Poison
+-----------------------------------------------------------
+Fire
+Strong against	- Earth and Ghost
+Weak against	- Water, Holy and Poison
+-----------------------------------------------------------
+Wind
+Strong against	- Water and Poison
+Weak against	- Sorcery, Earth and Holy
+-----------------------------------------------------------
+Earth    
+Strong against	- Wind and Holy
+Weak against	- Sorcery, Fire and Ghost
+-----------------------------------------------------------
+Water  
+Strong against	- Sorcery and Fire
+Weak against	- Wind, Poison and Ghost
+-----------------------------------------------------------
+Ghost    
+Strong against	- Neutral, Sorcery, Water and Earth
+Weak against	- Fire and Holy
+-----------------------------------------------------------
+Poison  
+Strong against	- Neutral, Fire, Water and Holy
+Weak against	- Sorcery and Wind
+-----------------------------------------------------------
+Holy      
+Strong against	- Neutral, Fire, Wind and Ghost
+Weak against	- Earth and Poison
+-----------------------------------------------------------
+Sorcery  
+Strong against	- Neutral, Earth, Wind and Poison
+Weak against	- Water and Ghost 
